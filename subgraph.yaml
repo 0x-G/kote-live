@@ -1,32 +1,54 @@
-specVersion: 0.0.1
+specVersion: 0.0.2
 schema:
   file: ./schema.graphql
 dataSources:
+  - kind: ethereum
+    name: ForestQuesting
+    network: arbitrum-one
+    source:
+      address: "0x1C478220c520a20924295E2325D0cE96ff64dCA6"
+      abi: ForestQuesting
+      startBlock: 11280436
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Squire
+        - Reward
+        - Transaction
+      abis:
+        - name: ForestQuesting
+          file: ./abis/ForestQuesting.json
+        - name: Squires
+          file: ./abis/Squires.json
+      eventHandlers:
+        - event: FinishedQuest(address,uint256)
+          handler: handleFinishedQuest
+        - event: StartedQuest(address,uint256,uint256)
+          handler: handleStartedQuest
+        - event: FiefReward(address,uint256,uint256,uint256)
+          handler: handleFiefReward
+        - event: SquireLevelUp(uint256,uint8)
+          handler: handleSquireLevelUp
+      file: ./src/mapping.ts
   - kind: ethereum
     name: Squires
     network: arbitrum-one
     source:
       address: "0xF7fBE8EEc9063AA518D11639565B018468bB4AbB"
       abi: Squires
+      startBlock: 10050034
     mapping:
       kind: ethereum/events
       apiVersion: 0.0.5
       language: wasm/assemblyscript
       entities:
-        - Approval
-        - ApprovalForAll
-        - OwnershipTransferred
-        - Transfer
+        - Squire
       abis:
         - name: Squires
           file: ./abis/Squires.json
       eventHandlers:
-        - event: Approval(indexed address,indexed address,indexed uint256)
-          handler: handleApproval
-        - event: ApprovalForAll(indexed address,indexed address,bool)
-          handler: handleApprovalForAll
-        - event: OwnershipTransferred(indexed address,indexed address)
-          handler: handleOwnershipTransferred
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
       file: ./src/mapping.ts

@@ -1,79 +1,251 @@
-import { BigInt } from "@graphprotocol/graph-ts"
+import { Address, BigInt } from "@graphprotocol/graph-ts"
 import {
   Squires,
   Approval,
   ApprovalForAll,
   OwnershipTransferred,
   Transfer
-} from "../generated/Squires/Squires"
-import { ExampleEntity } from "../generated/schema"
+} from "../generated/Squires/Squires";
 
-export function handleApproval(event: Approval): void {
-  // Entities can be loaded from the store using a string ID; this ID
-  // needs to be unique across all entities of the same type
-  let entity = ExampleEntity.load(event.transaction.from.toHex())
+import {
+  ForestQuesting,
+  FinishedQuest,
+  StartedQuest,
+  FiefReward,
+  SquireLevelUp
+} from "../generated/ForestQuesting/ForestQuesting";
 
-  // Entities only exist after they have been saved to the store;
-  // `null` checks allow to create entities on demand
-  if (!entity) {
-    entity = new ExampleEntity(event.transaction.from.toHex())
 
-    // Entity fields can be set using simple assignments
-    entity.count = BigInt.fromI32(0)
+import { Squire, Reward, Transaction } from "../generated/schema"
+
+export function handleFinishedQuest(event: FinishedQuest): void {
+  let squire = Squire.load(event.params.squireId.toString());
+
+  if(!squire) {
+    squire = new Squire(event.params.squireId.toString());
   }
 
-  // BigInt and BigDecimal math are supported
-  entity.count = entity.count + BigInt.fromI32(1)
 
-  // Entity fields can be set based on event parameters
-  entity.owner = event.params.owner
-  entity.approved = event.params.approved
+  let address = Address.fromString("0xf7fbe8eec9063aa518d11639565b018468bb4abb")
 
-  // Entities can be written to the store with `.save()`
-  entity.save()
+  let contract = Squires.bind(address);
 
-  // Note: If a handler doesn't require existing field values, it is faster
-  // _not_ to load the entity from the store. Instead, create it fresh with
-  // `new Entity(...)`, set the fields that should be updated and save the
-  // entity back to the store. Fields that were not set or unset remain
-  // unchanged, allowing for partial updates to be applied.
+  let tokenId = event.params.squireId;
+  
+  let faith = contract.faithByTokenId(tokenId);
+  let luck = contract.luckByTokenId(tokenId);
+  let strength = contract.strengthByTokenId(tokenId);
+  let type = contract.squireTypeByTokenId(tokenId);
+  let wisdom = contract.wisdomByTokenId(tokenId);
+  let genesis = contract.genesisByTokenId(tokenId);
+  
+  squire.faith = faith;
+  squire.luck = luck;
+  squire.strength = strength;
+  squire.type = type;
+  squire.wisdom = wisdom;
+  squire.genesis = genesis;
+  squire.lastupgrade = "";
 
-  // It is also possible to access smart contracts from mappings. For
-  // example, the contract that has emitted the event can be connected to
-  // with:
-  //
-  // let contract = Contract.bind(event.address)
-  //
-  // The following functions can then be called on this contract to access
-  // state variables and other data:
-  //
-  // - contract.balanceOf(...)
-  // - contract.baseURI(...)
-  // - contract.checkAllowedContracts(...)
-  // - contract.faithByTokenId(...)
-  // - contract.genesisByTokenId(...)
-  // - contract.getApproved(...)
-  // - contract.isApprovedForAll(...)
-  // - contract.luckByTokenId(...)
-  // - contract.name(...)
-  // - contract.owner(...)
-  // - contract.ownerOf(...)
-  // - contract.squireTypeByTokenId(...)
-  // - contract.strengthByTokenId(...)
-  // - contract.supportsInterface(...)
-  // - contract.symbol(...)
-  // - contract.tokenByIndex(...)
-  // - contract.tokenOfOwnerByIndex(...)
-  // - contract.tokenURI(...)
-  // - contract.tokensOfOwner(...)
-  // - contract.total(...)
-  // - contract.totalSupply(...)
-  // - contract.upgradeAmountByTokenId(...)
-  // - contract.wisdomByTokenId(...)
+  squire.owner = event.params._owner.toHexString();
+  squire.questing = false;
+  squire.finish = new BigInt(0);
+
+  squire.save();
+
+  let tx = Transaction.load(event.transaction.hash.toHexString());
+
+  if(!tx)
+    tx = new Transaction(event.transaction.hash.toHexString());
+
+    tx.save();
+
 }
 
-export function handleApprovalForAll(event: ApprovalForAll): void {}
+export function handleStartedQuest(event: StartedQuest): void {
+  let squire = Squire.load(event.params.squireId.toString());
 
-export function handleOwnershipTransferred(event: OwnershipTransferred): void {}
+  if(!squire) {
+    squire = new Squire(event.params.squireId.toString());
+  }
 
-export function handleTransfer(event: Transfer): void {}
+  let address = Address.fromString("0xf7fbe8eec9063aa518d11639565b018468bb4abb")
+
+  let contract = Squires.bind(address);
+
+  let tokenId = event.params.squireId;
+  
+  let faith = contract.faithByTokenId(tokenId);
+  let luck = contract.luckByTokenId(tokenId);
+  let strength = contract.strengthByTokenId(tokenId);
+  let type = contract.squireTypeByTokenId(tokenId);
+  let wisdom = contract.wisdomByTokenId(tokenId);
+  let genesis = contract.genesisByTokenId(tokenId);
+  
+  squire.faith = faith;
+  squire.luck = luck;
+  squire.strength = strength;
+  squire.type = type;
+  squire.wisdom = wisdom;
+  squire.genesis = genesis;
+
+
+  squire.owner = event.params._owner.toHexString();
+  squire.questing = true;
+  squire.finish = event.params.finishedAt;
+
+  squire.save();
+  
+  let tx = Transaction.load(event.transaction.hash.toHexString());
+
+  if(!tx)
+    tx = new Transaction(event.transaction.hash.toHexString());
+
+  tx.save();
+}
+
+export function handleFiefReward(event: FiefReward): void {
+  let squire = Squire.load(event.params.squireId.toString());
+
+  if(!squire)
+    return;
+
+  squire.lastfief = event.params.amount;
+
+  squire.save();
+
+  let reward = Reward.load(event.transaction.hash.toHexString());
+
+  if(!reward)
+    reward = new Reward(event.transaction.hash.toHexString());
+
+  reward.squireid = event.params.squireId;
+  reward.timestamp = event.params.timestamp;
+  reward.fief = event.params.amount;
+  reward.wallet = event.params._owner.toHexString();
+
+  reward.save();
+
+}
+
+export function handleSquireLevelUp(event: SquireLevelUp): void {
+  let squire = Squire.load(event.params.squireId.toString());
+
+  if(!squire)
+    return;
+
+  let upgradeType = "";
+
+  if(event.params.skillType == 0)
+    upgradeType = "Faith";
+
+  if(event.params.skillType == 1)
+    upgradeType = "Luck";
+
+  if(event.params.skillType == 2)
+    upgradeType = "Strength";
+
+  if(event.params.skillType == 3)
+    upgradeType = "Wisdom";
+
+  squire.lastupgrade = upgradeType;
+
+  squire.save();
+}
+
+export function handleTransfer(event: Transfer): void {
+  let squire = Squire.load(event.params.tokenId.toString());
+
+  if(!squire) {
+    squire = new Squire(event.params.tokenId.toString());
+  }
+
+  let contract = Squires.bind(event.address);
+
+  let tokenId = event.params.tokenId;
+
+  let faith = contract.faithByTokenId(tokenId);
+  let luck = contract.luckByTokenId(tokenId);
+  let strength = contract.strengthByTokenId(tokenId);
+  let type = contract.squireTypeByTokenId(tokenId);
+  let wisdom = contract.wisdomByTokenId(tokenId);
+  let genesis = contract.genesisByTokenId(tokenId);
+  
+  squire.faith = faith;
+  squire.luck = luck;
+  squire.strength = strength;
+  squire.type = type;
+  squire.wisdom = wisdom;
+  squire.genesis = genesis;
+
+  if(Address.fromString("0x1c478220c520a20924295e2325d0ce96ff64dca6").equals(event.params.to)) {
+    squire.questing = true;
+    squire.owner = event.params.from.toHexString();
+    squire.questtype = "forest";
+  } else {
+    squire.questing = false;
+    squire.owner = event.params.to.toHexString();
+  }
+
+  var tf = "";
+  var image = "";
+
+  if (type.toI32() == 1 && genesis.toI32() === 0) {
+    tf = "Strength";
+    image = "https://knightsoftheether.com/squires/images/strength.png";
+
+    squire.typename = tf;
+    squire.image = image;
+  }
+  if (type.toI32() == 2 && genesis.toI32() === 0) {
+      tf = "Wisdom";
+      image = "https://knightsoftheether.com/squires/images/wisdom.png";
+
+      squire.typename = tf;
+      squire.image = image;
+  }
+  if (type.toI32() == 3 && genesis.toI32() === 0) {
+      tf = "Luck";
+      image = "https://knightsoftheether.com/squires/images/luck.png";
+
+      squire.typename = tf;
+      squire.image = image;
+  }
+  if (type.toI32() == 4 && genesis.toI32() === 0) {
+      tf = "Faith";
+      image = "https://knightsoftheether.com/squires/images/faith.png";
+
+      squire.typename = tf;
+      squire.image = image;
+  }
+  if (type.toI32() == 1 && genesis.toI32() == 1) {
+      tf = "Genesis Strength";
+      image = "https://knightsoftheether.com/squires/images/strengthG.png";
+
+      squire.typename = tf;
+      squire.image = image;
+  }
+  if (type.toI32() == 2 && genesis.toI32() == 1) {
+      tf = "Genesis Wisdom";
+      image = "https://knightsoftheether.com/squires/images/wisdomG.png";
+
+      squire.typename = tf;
+      squire.image = image;
+  }
+  if (type.toI32() == 3 && genesis.toI32() == 1) {
+      tf = "Genesis Luck";
+      image = "https://knightsoftheether.com/squires/images/luckG.png";
+
+      squire.typename = tf;
+      squire.image = image;
+  }
+  if (type.toI32() == 4 && genesis.toI32() == 1) {
+      tf = "Genesis Faith";
+      image = "https://knightsoftheether.com/squires/images/faithG.png";
+
+      squire.typename = tf;
+      squire.image = image;
+}
+
+  squire.save();
+}
