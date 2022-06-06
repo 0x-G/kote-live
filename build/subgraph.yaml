@@ -17,11 +17,14 @@ dataSources:
         - Squire
         - Reward
         - Transaction
+        - SkillUpgrade
       abis:
         - name: ForestQuesting
           file: ForestQuesting\abis\ForestQuesting.json
         - name: Squires
           file: ForestQuesting\abis\Squires.json
+        - name: ItemData
+          file: ForestQuesting\abis\ItemData.json
       eventHandlers:
         - event: FinishedQuest(address,uint256)
           handler: handleFinishedQuest
@@ -31,6 +34,84 @@ dataSources:
           handler: handleFiefReward
         - event: SquireLevelUp(uint256,uint8)
           handler: handleSquireLevelUp
+      file: ForestQuesting\ForestQuesting.wasm
+  - kind: ethereum
+    name: CavernQuesting
+    network: arbitrum-one
+    source:
+      address: "0x011afB2FD1f67E7FD8f2A7d926245019ED93a900"
+      abi: CavernQuesting
+      startBlock: 12959404
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Squire
+        - Reward
+        - Transaction
+        - SkillUpgrade
+      abis:
+        - name: ForestQuesting
+          file: CavernQuesting\abis\ForestQuesting.json
+        - name: CavernQuesting
+          file: CavernQuesting\abis\CavernQuesting.json
+        - name: MountainQuesting
+          file: CavernQuesting\abis\MountainQuesting.json
+        - name: Squires
+          file: CavernQuesting\abis\Squires.json
+        - name: ItemData
+          file: CavernQuesting\abis\ItemData.json
+      eventHandlers:
+        - event: FinishedQuest(address,uint256)
+          handler: handleFinishedQuest
+        - event: StartedQuest(address,uint256,uint256)
+          handler: handleStartedQuest
+        - event: FiefReward(address,uint256,uint256,uint256)
+          handler: handleFiefReward
+        - event: SquireLevelUp(uint256,uint8)
+          handler: handleSquireLevelUp
+        - event: ItemReward(address,uint256,uint8,uint256)
+          handler: handleItemReward
+      file: ForestQuesting\ForestQuesting.wasm
+  - kind: ethereum
+    name: MountainQuesting
+    network: arbitrum-one
+    source:
+      address: "0xEE6F650593766d9114236986609ae52252c58d1a"
+      abi: MountainQuesting
+      startBlock: 12959553
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Squire
+        - Reward
+        - Transaction
+        - SkillUpgrade
+      abis:
+        - name: ForestQuesting
+          file: MountainQuesting\abis\ForestQuesting.json
+        - name: CavernQuesting
+          file: MountainQuesting\abis\CavernQuesting.json
+        - name: MountainQuesting
+          file: MountainQuesting\abis\MountainQuesting.json
+        - name: Squires
+          file: MountainQuesting\abis\Squires.json
+        - name: ItemData
+          file: MountainQuesting\abis\ItemData.json
+      eventHandlers:
+        - event: FinishedQuest(address,uint256)
+          handler: handleFinishedQuest
+        - event: StartedQuest(address,uint256,uint256)
+          handler: handleStartedQuest
+        - event: FiefReward(address,uint256,uint256,uint256)
+          handler: handleFiefReward
+        - event: SquireLevelUp(uint256,uint8)
+          handler: handleSquireLevelUp
+        - event: ItemReward(address,uint256,uint8,uint256)
+          handler: handleItemReward
       file: ForestQuesting\ForestQuesting.wasm
   - kind: ethereum
     name: Squires
@@ -51,4 +132,73 @@ dataSources:
       eventHandlers:
         - event: Transfer(indexed address,indexed address,indexed uint256)
           handler: handleTransfer
+      file: ForestQuesting\ForestQuesting.wasm
+  - kind: ethereum
+    name: SquiresRings
+    network: arbitrum-one
+    source:
+      address: "0x37865Fe8A9c839F330f35104EeD08d4E8136c339"
+      abi: SquireRings
+      startBlock: 12959142
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Squire
+        - InventoryItem
+      abis:
+        - name: SquireRings
+          file: SquiresRings\abis\SquireRings.json
+        - name: ItemData
+          file: SquiresRings\abis\ItemData.json
+      eventHandlers:
+        - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleRingTransfer
+      file: ForestQuesting\ForestQuesting.wasm
+  - kind: ethereum
+    name: SquirePotions
+    network: arbitrum-one
+    source:
+      address: "0x6F2aA70c70625E45424652aEd968E3971020F205"
+      abi: SquirePotions
+      startBlock: 12959247
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Squire
+        - InventoryItem
+      abis:
+        - name: SquirePotions
+          file: SquirePotions\abis\SquirePotions.json
+        - name: ItemData
+          file: SquirePotions\abis\ItemData.json
+      eventHandlers:
+        - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handlePotionTransfer
+      file: ForestQuesting\ForestQuesting.wasm
+  - kind: ethereum
+    name: SquireTrinkets
+    network: arbitrum-one
+    source:
+      address: "0x9f0cc315caE0826005b94462B5400849b3d39d91"
+      abi: SquireTrinkets
+      startBlock: 12959211
+    mapping:
+      kind: ethereum/events
+      apiVersion: 0.0.5
+      language: wasm/assemblyscript
+      entities:
+        - Squire
+        - InventoryItem
+      abis:
+        - name: SquireTrinkets
+          file: SquireTrinkets\abis\SquireTrinkets.json
+        - name: ItemData
+          file: SquireTrinkets\abis\ItemData.json
+      eventHandlers:
+        - event: TransferSingle(indexed address,indexed address,indexed address,uint256,uint256)
+          handler: handleTrinketTransfer
       file: ForestQuesting\ForestQuesting.wasm
