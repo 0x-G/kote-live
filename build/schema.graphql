@@ -41,6 +41,7 @@ type SkillUpgrade @entity {
   upgraded: String!
   newvalue: Int!
   squireid: BigInt!
+  hash: String!
 }
 
 type ItemRewardData @entity {
@@ -56,6 +57,7 @@ type ItemRewardData @entity {
   squireId: BigInt!
   quest: String!
   gotitem: Boolean!
+  image: String!
 }
 
 type InventoryItem @entity {

@@ -151,6 +151,22 @@ export function handleFiefReward(event: FiefReward): void {
 
   reward.save();
 
+  let levelUp = SkillUpgrade.load(event.transaction.hash.toHexString() + " " + event.params.squireId.toString());
+
+
+    if(!levelUp) {
+      levelUp = new SkillUpgrade(event.transaction.hash.toHexString() + " " + event.params.squireId.toString())
+
+      levelUp.squireid = event.params.squireId;
+      levelUp.hash = event.transaction.hash.toHexString();
+
+      levelUp.upgraded = "None";
+      levelUp.newvalue = 0;
+
+      levelUp.save();
+    }
+
+
   let rewardD = ItemRewardData.load(event.transaction.hash.toHexString() + " " + event.params.squireId.toString());
  
   if(!rewardD)
@@ -165,6 +181,7 @@ export function handleFiefReward(event: FiefReward): void {
     rewardD.timestamp = event.params.timestamp.toI32();
     rewardD.itemtype = "";
     rewardD.gotitem = false;
+    rewardD.image = "";
 
     if(Address.fromString("0x1C478220c520a20924295E2325D0cE96ff64dCA6").equals(event.address)) {
       rewardD.quest = "forest";
@@ -196,12 +213,14 @@ export function handleSquireLevelUp(event: SquireLevelUp): void {
 
   let tokenId = event.params.squireId;
 
-  let levelUp = SkillUpgrade.load(event.transaction.hash.toHexString() + event.params.squireId.toString());
+  let levelUp = SkillUpgrade.load(event.transaction.hash.toHexString() + " " + event.params.squireId.toString());
 
   if(!levelUp)
-    levelUp = new SkillUpgrade(event.transaction.hash.toHexString() + event.params.squireId.toString())
+    levelUp = new SkillUpgrade(event.transaction.hash.toHexString() + " " + event.params.squireId.toString())
 
   levelUp.squireid = tokenId;
+
+  levelUp.hash = event.transaction.hash.toHexString();
 
   if(event.params.skillType == 0) {
     upgradeType = "Faith";
@@ -306,6 +325,7 @@ export function handleItemReward(event: ItemReward): void {
   rewardD.timestamp = event.block.timestamp.toI32();
   rewardD.itemtype = itemType;
   rewardD.gotitem = true;
+  rewardD.image = image;
 
   rewardD.save();
   

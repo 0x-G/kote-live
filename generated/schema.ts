@@ -377,6 +377,7 @@ export class SkillUpgrade extends Entity {
     this.set("upgraded", Value.fromString(""));
     this.set("newvalue", Value.fromI32(0));
     this.set("squireid", Value.fromBigInt(BigInt.zero()));
+    this.set("hash", Value.fromString(""));
   }
 
   save(): void {
@@ -430,6 +431,15 @@ export class SkillUpgrade extends Entity {
   set squireid(value: BigInt) {
     this.set("squireid", Value.fromBigInt(value));
   }
+
+  get hash(): string {
+    let value = this.get("hash");
+    return value!.toString();
+  }
+
+  set hash(value: string) {
+    this.set("hash", Value.fromString(value));
+  }
 }
 
 export class ItemRewardData extends Entity {
@@ -448,6 +458,7 @@ export class ItemRewardData extends Entity {
     this.set("squireId", Value.fromBigInt(BigInt.zero()));
     this.set("quest", Value.fromString(""));
     this.set("gotitem", Value.fromBoolean(false));
+    this.set("image", Value.fromString(""));
   }
 
   save(): void {
@@ -572,6 +583,15 @@ export class ItemRewardData extends Entity {
 
   set gotitem(value: boolean) {
     this.set("gotitem", Value.fromBoolean(value));
+  }
+
+  get image(): string {
+    let value = this.get("image");
+    return value!.toString();
+  }
+
+  set image(value: string) {
+    this.set("image", Value.fromString(value));
   }
 }
 
